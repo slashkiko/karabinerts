@@ -55,27 +55,45 @@ const swapCapsLockAndLeftControl = () => {
   ]);
 }
 
-const enableLayer2 = () => {
-  const id = 'Layer2';
+const enableLayer1 = () => {
+  const id = 'Layer1';
   const activated = 1;
   const deactivated = 0;
-  return rule('Enable Layer 2').manipulators([
+  const trigger = 'right_option';
+  return rule(id).manipulators([
     withMapper([
-      'n',                // 0
-      ...['m', ',', '.'], // 1 2 3
-      ...['j', 'k', 'l'], // 4 5 6
-      ...['u', 'i', 'o'], // 7 8 9
+      'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
     ] as const)((k, i) =>
       map(k)
-        .to(`keypad_${i as 0}`)
+        .to(`keypad_${k === 'p' ? 0 : i + 1 as 0}`)
         .condition({
           name: id,
           type: 'variable_if',
           value: activated,
         })),
-
+    withMapper({
+      'open_bracket': 'hyphen',  // [
+      'close_bracket': 'equal_sign', // ]
+    } as const)((keyFrom, keyTo) =>
+      map({ key_code: keyFrom })
+        .to({ key_code: keyTo })
+        .condition({
+          name: id,
+          type: 'variable_if',
+          value: activated,
+        })),
+    withMapper([
+      'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'semicolon', 'quote', 'slash',
+    ] as const)((k, i) =>
+      map(k)
+        .to({ key_code: `${k === 'semicolon' ? 0 : (k === 'quote' ? 'hyphen' : (k === 'slash' ? 'equal_sign' : i + 1 as 0))}`, modifiers: ['shift'] })
+        .condition({
+          name: id,
+          type: 'variable_if',
+          value: activated,
+        })),
     map({
-      key_code: 'right_option',
+      key_code: trigger,
     })
       .to([{
         set_notification_message: { id, text: `${id} activated` },
@@ -94,5 +112,5 @@ writeToProfile('karabiner_ts', [
   useCommandAsKanaEisuu(),
   quitAppByPressingCommandQTwice(),
   swapCapsLockAndLeftControl(),
-  enableLayer2(),
+  enableLayer1(),
 ]);
