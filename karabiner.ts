@@ -108,9 +108,47 @@ const enableLayer1 = () => {
   ]);
 }
 
+const alwaysHalfSpace = () => {
+  return rule('Always half space').manipulators([
+    map({
+      key_code: 'spacebar',
+    })
+      .to(
+        {
+          key_code: 'spacebar',
+          modifiers: ['left_shift']
+        }
+      )
+      .condition({
+        type: 'input_source_if',
+        input_sources: [{
+          input_mode_id: "com.apple.inputmethod.Japanese",
+          language: "ja"
+        }]
+      }),
+    map({
+      key_code: 'spacebar',
+      modifiers: { mandatory: ['left_shift'] }
+    })
+      .to(
+        {
+          key_code: 'spacebar',
+        }
+      )
+      .condition({
+        type: 'input_source_if',
+        input_sources: [{
+          input_mode_id: "com.apple.inputmethod.Japanese",
+          language: "ja"
+        }]
+      }),
+  ]);
+}
+
 writeToProfile('karabiner_ts', [
   useCommandAsKanaEisuu(),
   quitAppByPressingCommandQTwice(),
   swapCapsLockAndLeftControl(),
   enableLayer1(),
+  alwaysHalfSpace(),
 ]);
